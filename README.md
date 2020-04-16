@@ -2,7 +2,7 @@
 
 ## 准备
 
-- 在**python* **环境中执行:
+- 在***-python-***环境中执行:
   
   ```shell
   pip install pyperclip, PyExecJS
@@ -10,9 +10,9 @@
   
 - 把start.bat拷贝到任意一个你觉得方便的地方，比如桌面
 
-- 将start.bat中第一个参数更改为你电脑中**python* **所在的绝对位置
+- 将start.bat中第一个参数更改为你电脑中***-python-***所在的绝对位置
 
-  - **注意**：两个**python* **应该是同一个，也即环境要对应，建议装在base环境就好了
+  - **注意**：两个***-python-***应该是同一个，也即环境要对应，建议装在base环境就好了
 
 - 第二个参数更改为copyTranslate.py文件的绝对路径
 ## 使用
