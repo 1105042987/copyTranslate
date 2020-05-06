@@ -1,1 +1,1 @@
-start F:\Anaconda\python D:\Documents\VSCode\python\copyTranslate\copyTranslate.py
+start F:\Anaconda\python D:\Documents\GitHub\copyTranslate\copyTranslate.py

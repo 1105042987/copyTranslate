@@ -5,7 +5,8 @@
 - 在***python***环境中执行:
   
   ```shell
-  pip install pyperclip, PyExecJS
+  conda install swig
+  pip install pyperclip, PyExecJS, PyHook3
   ```
   
 - 把start.bat拷贝到任意一个你觉得方便的地方，比如桌面
