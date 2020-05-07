@@ -1,0 +1,16 @@
+{
+    "//":"Ensure that the combination key is end with the elements in last part",
+
+    "translate": ["alt", "Q"], 
+    "CH<->EN":   ["alt", "L"], 
+    "LineSplit": ["alt", ","], 
+
+    "//Combination":["shift", "ctrl", "alt"],
+    "//Last_Key (can choose only one)":[
+        "F1~F12", "0~9", "A~Z",
+        "`",  "-", "=", "[", "]", "\\", ";", "'", ",", ".", "/", " ",
+        "Up", "Down", "Left", "Right", "PageUp", "PageDown",
+        "Esc", "Home", "End", "Insert", "Delete", 
+        "Tab", "CapsLock", "Enter", "Back"
+    ]
+}

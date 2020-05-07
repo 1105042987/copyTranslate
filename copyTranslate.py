@@ -1,4 +1,5 @@
 import os
+import json
 import PyHook3
 import win32api
 import win32gui
@@ -6,7 +7,7 @@ import pyperclip
 import pythoncom
 import threading
 import tkinter as tk
-from googleTrans import translate
+from googleTrans import translate as GT
 
 ct = win32api.GetConsoleTitle()
 hd = win32gui.FindWindow(0, ct)
@@ -15,6 +16,36 @@ win32gui.ShowWindow(hd, 0)
 # Listen Keyboard
 textBoard = None
 windowThread = None
+SbyS_trans = False
+tarLan = 'zh-CN'
+
+combineKey={
+   'shift':False,
+   'ctrl':False,
+   'menu':False,
+}
+
+checkList={
+    ',':'Oem_Comma',
+    '.':'Oem_Period',
+    ';':'Oem_1',
+    '/':'Oem_2',
+    '`':'Oem_3',
+    '[':'Oem_4',
+    '\\':'Oem_5',
+    ']':'Oem_6',
+    '\'':'Oem_7',
+    '-':'Oem_Minus',
+    '=':'Oem_Plus',
+    'Enter':'Return',
+    'Esc':'Escape',
+    'alt':'menu',
+    'CapsLock':'Capital',
+    'PageUp':'Prior',
+    'PageDown':'Next',
+    ' ':'Space',
+}
+
 
 with open('stop.bat','w') as f:
     f.write('taskkill /pid {} /f\n'.format(os.getpid()))
@@ -51,22 +82,65 @@ class MyThread(threading.Thread):
             self.app.withdraw()
         self.app.mainloop()
 
-def onKeyboardEvent(event):
-    global textBoard,windowThread
-    if event.Ascii == 17:
-        info = pyperclip.paste()
-        if len(info)==0: return True
-        trans = info.replace('\n',' ').replace('\r',' ')#.replace('. ','.\n')
-        trans = translate(trans,oriLan='en')
-        if windowThread.hide:
-            windowThread.show()
-        textBoard['text'] = trans
-    return True
+def translate():
+    global textBoard,windowThread,SbyS_trans,tarLan
+    info = pyperclip.paste()
+    if len(info)==0: return
+    trans = info.replace('\n',' ').replace('\r',' ')
+    if SbyS_trans:
+        trans = trans.replace('. ','.\n\n')
+    trans = GT(trans,tarLan=tarLan)
+    if windowThread.hide:
+        windowThread.show()
+    textBoard['text'] = trans
+
+def LineSplit():
+    global SbyS_trans
+    SbyS_trans = not SbyS_trans
+    translate()
+
+def changeLanguage():
+    global tarLan
+    tarLan = 'en' if tarLan == 'zh-CN' else 'zh-CN'
+    translate()
+
+func = [translate,LineSplit,changeLanguage]
+
+def onKeyUp(event):
+   global combineKey
+   for key in combineKey.keys():
+      if key in event.Key:
+         combineKey[key] = False
+         return True
+   return True
+
+def onKeyDown(event):
+   global combineKey
+   for key in combineKey.keys():
+      if key in event.Key:
+         combineKey[key] = True
+         return True
+   for i in range(3):
+      for k in keys[i][:-1]:
+         if not combineKey[k]: 
+            break
+      else:
+         if keys[i][-1] == event.Key:
+            func[i]()
+            # print(name[i])
+            return True
+   return True
         
 if __name__ == "__main__":
+    with open('setting.json','r') as f:
+        dic = json.load(f)
+    name = ['translate','CH<->EN','LineSplit']
+    keys = [[checkList[x] if x in checkList else x for x in dic[n]] for n in name]
+
     windowThread = MyThread(None)
     windowThread.start()
     hm = PyHook3.HookManager()
-    hm.KeyDown = onKeyboardEvent
+    hm.KeyDown = onKeyDown
+    hm.KeyUp = onKeyUp
     hm.HookKeyboard()
     pythoncom.PumpMessages()
