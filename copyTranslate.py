@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import PyHook3
 import win32api
@@ -132,7 +133,8 @@ def onKeyDown(event):
    return True
         
 if __name__ == "__main__":
-    with open('setting.json','r') as f:
+    base = sys.path[0]
+    with open(os.path.join(base,'setting.json'),'r') as f:
         dic = json.load(f)
     name = ['translate','CH<->EN','LineSplit']
     keys = [[checkList[x] if x in checkList else x for x in dic[n]] for n in name]
