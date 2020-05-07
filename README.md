@@ -11,9 +11,10 @@
   
 - 把start.bat拷贝到任意一个你觉得方便的地方，比如桌面
 
-- 将start.bat中第一个参数更改为你电脑中***python***所在的绝对位置
+- 当确定当前环境可以正常运行`python copyTranslate.py`时，更改start.bat中第一个参数为：
 
-  - **注意**：两个***python***应该是同一个，也即环境要对应，建议装在base环境就好了
+  - win中使用cmd运行`where python`，将第一个返回值填入
+  - linux中使用terminal运行`which python`，讲第一个返回值填入
 
 - 第二个参数更改为copyTranslate.py文件的绝对路径
 ## 使用
