@@ -1,9 +1,8 @@
 {
     "//":"Ensure that the combination key is end with the elements in last part",
 
-    "translate": ["alt", "Q"], 
-    "CH<->EN":   ["alt", "L"], 
-    "LineSplit": ["alt", ","], 
+    "translate": ["ctrl", "shift", "Q"], 
+    "append":   ["ctrl", "shift", "A"], 
 
     "//Combination":["shift", "ctrl", "alt"],
     "//Last_Key (can choose only one)":[

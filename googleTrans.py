@@ -138,7 +138,7 @@ def get_translate(word, tl, sl):
     return translate_result
 
 
-def __TransSingle(oriText,tarLan='zh-CN',oriLan='auto'):
+def TransSingle(oriText,tarLan='zh-CN',oriLan='auto'):
     results = get_translate(oriText, tarLan, oriLan)
     translate_result = ""
     for result in results:
@@ -162,20 +162,21 @@ def __genTextPool(text):
     return textPool
     
 class __TransThread(threading.Thread):
-    def __init__(self, threadID, texts, sl='auto', tl='zh-CN'):
+    def __init__(self, threadID, texts, sl='auto', tl='zh-CN', tqdm=False):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.texts = texts
+        self.useTqdm = tqdm
         self.sl = sl
         self.tl = tl
         self.ans = ''
 
     def run(self):
-        if self.threadID==1:
+        if self.useTqdm and self.threadID==1 :
             from tqdm import tqdm
             self.texts = tqdm(self.texts,ascii=True)
         for t in self.texts:
-            self.ans += __TransSingle(t,self.tl,self.sl)+'\n'
+            self.ans += TransSingle(t,self.tl,self.sl)+'\n'
 
 
 def translate(text,tarLan='zh-CN',oriLan='auto',numThread=8):
@@ -193,7 +194,7 @@ def translate(text,tarLan='zh-CN',oriLan='auto',numThread=8):
     zh-TW：中文繁体
     """
     if len(text)<1500:
-        return __TransSingle(text,tarLan,oriLan)
+        return TransSingle(text,tarLan,oriLan)
     else:
         textPool = __genTextPool(text)
         num = len(textPool)//numThread

@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import time
 import PyHook3
 import win32api
 import win32gui
@@ -15,14 +16,12 @@ hd = win32gui.FindWindow(0, ct)
 win32gui.ShowWindow(hd, 0)
 
 # Listen Keyboard
-textBoard = None
-windowThread = None
 SbyS_trans = False
 tarLan = 'zh-CN'
 
 combineKey={
    'shift':False,
-   'ctrl':False,
+   'control':False,
    'menu':False,
 }
 
@@ -45,6 +44,7 @@ checkList={
     'PageUp':'Prior',
     'PageDown':'Next',
     ' ':'Space',
+    'ctrl':'control',
 }
 
 
@@ -57,6 +57,7 @@ class MyThread(threading.Thread):
         threading.Thread.__init__(self)
         self.text = text
         self.hide = True
+        self.last = ''
 
     def on_closing(self):
         self.app.withdraw()
@@ -66,80 +67,105 @@ class MyThread(threading.Thread):
         self.hide = False
         self.app.update()
         self.app.deiconify()
+    
+    def LineSplit(self):
+        global SbyS_trans
+        SbyS_trans = not SbyS_trans
+        self.Line['text'] = 'Line' if SbyS_trans else 'Whole'
+        self.translate(oldInput=True)
+    
+    def changeLanguage(self):
+        global tarLan
+        tarLan = 'en' if tarLan == 'zh-CN' else 'zh-CN'
+        self.Lang['text'] = tarLan[-2:].upper()
+        self.translate(oldInput=True)
+
+    def appendText(self):
+        self.translate(append=True)
+
+    def translate(self,append=False,oldInput=False):
+        global SbyS_trans,tarLan
+        info = pyperclip.paste()
+        if len(info)==0: return
+        if oldInput or self.last != info:
+            if append:
+                info = self.last + ' ' + info
+                pyperclip.copy(info)
+            self.last = info
+            info = info.replace('\n',' ').replace('\r',' ')
+            if SbyS_trans:
+                info = info.replace('. ','.\n\n')
+            trans = ''
+            # while len(trans)==0:
+            trans = GT(info,tarLan=tarLan)
+                # print(len(trans))
+            self.textBoard['text'] = trans
+        if self.hide:
+            self.show()
+        self.app.update()
+        w=self.app.winfo_screenwidth() - 350
+        h=(self.app.winfo_screenheight() - self.app.winfo_height())//3
+        self.app.geometry("+{}+{}".format(w,h)) 
+
+    def Tcopy(self):
+        pyperclip.copy(self.textBoard['text'])
 
     def run(self):
-        global textBoard
         self.app = tk.Tk()
         self.app.wm_attributes('-topmost', 1)
-        self.app.overrideredirect(1)
-        w=self.app.winfo_screenwidth() - 350
-        h=self.app.winfo_screenheight()//3
-        self.app.geometry("+{}+{}".format(w,h))
-        btn = tk.Button(self.app, text="Hide", command=self.on_closing, width=40, height=1, bg = "Gray")
-        btn.pack()
-        textBoard = tk.Label(self.app, text=self.text, bg='white', width = 40, wraplength = 240, justify = 'left')
-        textBoard.pack()
+        self.app.overrideredirect(1)        
+        frame = tk.Frame()
+        frame.pack()
+        self.Lang = tk.Button(frame, text="CN", command=self.changeLanguage, bg = "Gray",width=18, height=1)
+        self.Line = tk.Button(frame, text="Whole", command=self.LineSplit,   bg = "Gray",width=18, height=1)
+        btn = tk.Button(frame, text="X", command=self.on_closing, bg = "Red", width=4,  height=1)
+        self.Lang.pack(side=tk.LEFT)
+        self.Line.pack(side=tk.LEFT)
+        btn.pack(side=tk.LEFT)
+
+        self.textBoard = tk.Label(self.app, text=self.text, bg='white', width = 43, wraplength = 240, justify = 'left')
+        self.textBoard.pack()
+        copy = tk.Button(self.app, text="Copy", command=self.Tcopy, bg = "DeepSkyBlue", width=43, height=1)
+        copy.pack()
         if self.text is None:
-            self.app.withdraw()
+            # self.app.withdraw()
+            self.translate()
         self.app.mainloop()
 
-def translate():
-    global textBoard,windowThread,SbyS_trans,tarLan
-    info = pyperclip.paste()
-    if len(info)==0: return
-    trans = info.replace('\n',' ').replace('\r',' ')
-    if SbyS_trans:
-        trans = trans.replace('. ','.\n\n')
-    trans = GT(trans,tarLan=tarLan)
-    if windowThread.hide:
-        windowThread.show()
-    textBoard['text'] = trans
-
-def LineSplit():
-    global SbyS_trans
-    SbyS_trans = not SbyS_trans
-    translate()
-
-def changeLanguage():
-    global tarLan
-    tarLan = 'en' if tarLan == 'zh-CN' else 'zh-CN'
-    translate()
-
-func = [translate,LineSplit,changeLanguage]
-
 def onKeyUp(event):
-   global combineKey
-   for key in combineKey.keys():
-      if key in event.Key:
-         combineKey[key] = False
-         return True
-   return True
+    global combineKey
+    for key in combineKey.keys():
+        if key in event.Key:
+            combineKey[key] = False
+            return True
+    return True
 
 def onKeyDown(event):
-   global combineKey
-   for key in combineKey.keys():
-      if key in event.Key:
-         combineKey[key] = True
-         return True
-   for i in range(3):
-      for k in keys[i][:-1]:
-         if not combineKey[k]: 
-            break
-      else:
-         if keys[i][-1] == event.Key:
-            func[i]()
-            # print(name[i])
+    global combineKey
+    for key in combineKey.keys():
+        if key in event.Key:
+            combineKey[key] = True
             return True
-   return True
+    for i in range(len(name)):
+        # print(combineKey)
+        for k in keys[i][:-1]:
+            if not combineKey[k]: 
+                break
+        else:
+            if keys[i][-1] == event.Key:
+                func[i]()
+                # print(name[i])
+                return True
+    return True
         
 if __name__ == "__main__":
     base = sys.path[0]
     with open(os.path.join(base,'setting.json'),'r') as f:
         dic = json.load(f)
-    name = ['translate','CH<->EN','LineSplit']
+    name = ['translate','append']#,'CH<->EN','LineSplit']
     keys = [[checkList[x] if x in checkList else x for x in dic[n]] for n in name]
-
     windowThread = MyThread(None)
+    func = [windowThread.translate,windowThread.appendText]
     windowThread.start()
     hm = PyHook3.HookManager()
     hm.KeyDown = onKeyDown
