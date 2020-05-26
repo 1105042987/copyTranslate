@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-import time
+from time import time
 import PyHook3
 import win32api
 import win32gui
@@ -20,9 +20,9 @@ SbyS_trans = False
 tarLan = 'zh-CN'
 
 combineKey={
-   'shift':False,
-   'control':False,
-   'menu':False,
+   'shift':0,
+   'control':0,
+   'menu':0,
 }
 
 checkList={
@@ -96,9 +96,7 @@ class MyThread(threading.Thread):
             if SbyS_trans:
                 info = info.replace('. ','.\n\n')
             trans = ''
-            # while len(trans)==0:
             trans = GT(info,tarLan=tarLan)
-                # print(len(trans))
             self.textBoard['text'] = trans
         if self.hide:
             self.show()
@@ -128,7 +126,6 @@ class MyThread(threading.Thread):
         copy = tk.Button(self.app, text="Copy", command=self.Tcopy, bg = "DeepSkyBlue", width=43, height=1)
         copy.pack()
         if self.text is None:
-            # self.app.withdraw()
             self.translate()
         self.app.mainloop()
 
@@ -136,7 +133,7 @@ def onKeyUp(event):
     global combineKey
     for key in combineKey.keys():
         if key in event.Key:
-            combineKey[key] = False
+            combineKey[key] = 0
             return True
     return True
 
@@ -144,25 +141,23 @@ def onKeyDown(event):
     global combineKey
     for key in combineKey.keys():
         if key in event.Key:
-            combineKey[key] = True
+            combineKey[key] = time()
             return True
     for i in range(len(name)):
-        # print(combineKey)
-        for k in keys[i][:-1]:
-            if not combineKey[k]: 
-                break
-        else:
-            if keys[i][-1] == event.Key:
+        if keys[i][-1] == event.Key:
+            for k in keys[i][:-1]:
+                if (time()-combineKey[k])>3: 
+                    break
+            else:
                 func[i]()
-                # print(name[i])
-                return True
+            return True
     return True
         
 if __name__ == "__main__":
     base = sys.path[0]
     with open(os.path.join(base,'setting.json'),'r') as f:
         dic = json.load(f)
-    name = ['translate','append']#,'CH<->EN','LineSplit']
+    name = ['translate','append']
     keys = [[checkList[x] if x in checkList else x for x in dic[n]] for n in name]
     windowThread = MyThread(None)
     func = [windowThread.translate,windowThread.appendText]
