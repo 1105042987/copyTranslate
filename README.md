@@ -3,7 +3,7 @@
 ## 准备
 
 ### 方法一 —— 脚本配置：
-- 如果你比较懒，可以在conda的python环境中直接运行指令，即可在当前环境中自动安装环境并创建start.bat脚本。
+- 如果懒得管的话，可以在conda的python环境中直接运行指令，即可在当前环境中自动安装环境并创建start.bat脚本。
   
   - **注意**，该方法会默认更新pip到最新版本，如果你不想更新，可以参照方法二中的第一条进行环境安装。
   
@@ -11,7 +11,7 @@
   python setup.py install
   ```
   
-- 如果你只是懒得找地址，可以运行以下指令，不安装环境，只生成当前所激活环境对应的start.bat脚本。
+- 如果只是懒得找地址，可以运行以下指令，不安装环境，只生成当前所激活环境对应的start.bat脚本。
   ```python
   python setup.py
   ```
@@ -23,12 +23,11 @@
   pip install pyperclip PyExecJS PyHook3
   ```
   
-- 更改start.bat中第一个参数为：
+- 创建start.bat文件，写入内容`start param1 param2`；
 
-  - **win：**在当前命令行中运行`where python`，将第一个返回值填入；
-  - **linux：**在当前命令行中运行`which python`，将第一个返回值填入；
+- 其中第一个参数为当：在当前命令行中运行`where python`得到的第一个返回值；
 
-- 第二个参数更改为copyTranslate.py文件的绝对路径。
+- 第二个参数为：copyTranslate.py文件所在的绝对路径。
 
 ### 错误处理
 - 如果在安装PyHook3时报错`Microsoft Visual C++ 14.0 is required`；
