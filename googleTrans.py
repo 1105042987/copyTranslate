@@ -109,7 +109,7 @@ def translate_request(js, text, tl='zh-CN', sl='auto'):
                     if debug:
                         print(correct_text)
                     correct_url = build_url(correct_text, js.get_tk(correct_text), tl)
-                    correct_response = requests.get(correct_url)
+                    correct_response = requests.get(correct_url,timeout=3)
                     correct_result = json.loads(correct_response.text)
                     res = correct_result[0]
                 except Exception as e:

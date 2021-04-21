@@ -18,6 +18,8 @@ win32gui.ShowWindow(hd, 0)
 # Listen Keyboard
 SbyS_trans = False
 tarLan = 'zh-CN'
+trans_call = None
+Trans_End = True
 
 combineKey={
    'shift':0,
@@ -47,15 +49,26 @@ checkList={
     'ctrl':'control',
 }
 
+if len(sys.argv)==1:
+    with open('stop.bat','w') as f:
+        f.write('taskkill /pid {} /f\n'.format(os.getpid()))
+        f.write('del %0')
 
-with open('stop.bat','w') as f:
-    f.write('taskkill /pid {} /f\n'.format(os.getpid()))
-    f.write('del %0')
 
-class MyThread(threading.Thread):
+class TransThread(threading.Thread):
     def __init__(self,text):
         threading.Thread.__init__(self)
         self.text = text
+
+    def run(self):
+        global tarLan,Trans_End
+        trans = GT(self.text,tarLan=tarLan)
+        windowThread.showTrans(trans)
+        Trans_End = True
+
+class UIThread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
         self.hide = True
         self.last = ''
 
@@ -83,8 +96,21 @@ class MyThread(threading.Thread):
     def appendText(self):
         self.translate(append=True)
 
+    def showTrans(self,trans):
+        if len(trans)==0: self.last = ''
+        self.textBoard['text'] = trans
+        if self.hide:
+            self.show()
+        self.copy['text'] = 'Copy'
+        self.app.update()
+        w=self.app.winfo_screenwidth() - 350
+        h=(self.app.winfo_screenheight() - self.app.winfo_height())//3
+        self.app.geometry("+{}+{}".format(w,h)) 
+
     def translate(self,append=False,oldInput=False):
-        global SbyS_trans,tarLan
+        global SbyS_trans,Trans_End,trans_call
+        if not Trans_End: return
+        if trans_call is not None: trans_call.join()
         info = pyperclip.paste()
         if len(info)==0: return
         if oldInput or self.last != info:
@@ -92,18 +118,16 @@ class MyThread(threading.Thread):
                 info = self.last + ' ' + info
                 pyperclip.copy(info)
             self.last = info
-            info = info.replace('\n',' ').replace('\r',' ')
+            # info = info.replace('\n',' ').replace('\r',' ')
+            info = info.replace('\n','').replace('\r','')
             if SbyS_trans:
                 info = info.replace('. ','.\n\n')
-            trans = ''
-            trans = GT(info,tarLan=tarLan)
-            self.textBoard['text'] = trans
+            Trans_End = False
+            self.copy['text'] = 'Translating...'
+            trans_call = TransThread(info)
+            trans_call.start()
         if self.hide:
             self.show()
-        self.app.update()
-        w=self.app.winfo_screenwidth() - 350
-        h=(self.app.winfo_screenheight() - self.app.winfo_height())//3
-        self.app.geometry("+{}+{}".format(w,h)) 
 
     def Tcopy(self):
         pyperclip.copy(self.textBoard['text'])
@@ -121,16 +145,18 @@ class MyThread(threading.Thread):
         self.Line.pack(side=tk.LEFT)
         btn.pack(side=tk.LEFT)
 
-        self.textBoard = tk.Label(self.app, text=self.text, bg='white', width = 43, wraplength = 240, justify = 'left')
+        self.textBoard = tk.Label(self.app, text='', bg='white', width = 43, wraplength = 240, justify = 'left')
         self.textBoard.pack()
-        copy = tk.Button(self.app, text="Copy", command=self.Tcopy, bg = "DeepSkyBlue", width=43, height=1)
-        copy.pack()
-        if self.text is None:
-            self.translate()
+        self.copy = tk.Button(self.app, text="Copy", command=self.Tcopy, bg = "DeepSkyBlue", width=43, height=1)
+        self.copy.pack()
+
+        self.showTrans('')
+        self.on_closing()
         self.app.mainloop()
 
 def onKeyUp(event):
     global combineKey
+    if event.Key is None: return True
     for key in combineKey.keys():
         if key in event.Key:
             combineKey[key] = 0
@@ -139,6 +165,7 @@ def onKeyUp(event):
 
 def onKeyDown(event):
     global combineKey
+    if event.Key is None: return True
     for key in combineKey.keys():
         if key in event.Key:
             combineKey[key] = time()
@@ -159,7 +186,7 @@ if __name__ == "__main__":
         dic = json.load(f)
     name = ['translate','append']
     keys = [[checkList[x] if x in checkList else x for x in dic[n]] for n in name]
-    windowThread = MyThread(None)
+    windowThread = UIThread()
     func = [windowThread.translate,windowThread.appendText]
     windowThread.start()
     hm = PyHook3.HookManager()
