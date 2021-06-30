@@ -3,36 +3,33 @@
 ## 准备
 
 ### 方法一 —— 脚本配置：
-- 如果懒得管的话，可以在conda的python环境中直接运行指令，即可在当前环境中自动安装环境并创建start.bat脚本。
-  
+- 确保python版本为3.7，并且已经安装pip
+- 执行以下指令  
   - **注意**，该方法会默认更新pip到最新版本，如果你不想更新，可以参照方法二中的第一条进行环境安装。
-  
   ```python
   python setup.py install
   ```
-  
-- 如果只是懒得找地址，可以运行以下指令，不安装环境，只生成当前所激活环境对应的start.bat脚本。
+
+- 如果已经安装完成，但没有start.bat脚本，可以运行以下指令，不安装环境，只生成当前所激活环境对应的start.bat脚本。
   ```python
   python setup.py
   ```
 
-### 方法二 —— 手动管理：
+### 方法二 —— 手动配置：
 - 在conda的python环境中按顺序执行以下内容:
   ```shell
   conda install swig
   pip install pyperclip PyExecJS PyHook3
   ```
-  
+
 - 创建start.bat文件，写入内容`start param1 param2`；
+  - 其中第一个参数为当：在当前命令行中运行`where python`得到的第一个返回值；
+  - 第二个参数为：copyTranslate.py文件所在的绝对路径。
 
-- 其中第一个参数为当：在当前命令行中运行`where python`得到的第一个返回值；
-
-- 第二个参数为：copyTranslate.py文件所在的绝对路径。
-
-### 错误处理
+### 方法二错误处理
 - 如果在安装PyHook3时报错`Microsoft Visual C++ 14.0 is required`；
   - 访问[Microsoft官网](https://visualstudio.microsoft.com/visual-cpp-build-tools/)或者[第三方网址](https://474b.com/file/1445568-239446865 )下载安装工具并安装文件。
-- 如果有人遇到其他问题可以给我发issue（虽然可能并没有人用）。
+
 ## 使用
 
 - 把start.bat拷贝到任意一个你觉得方便的地方，比如桌面；
