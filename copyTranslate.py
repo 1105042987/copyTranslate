@@ -11,9 +11,11 @@ import threading
 import tkinter as tk
 from googleTrans import translate as GT
 
-ct = win32api.GetConsoleTitle()
-hd = win32gui.FindWindow(0, ct)
-win32gui.ShowWindow(hd, 0)
+os.environ['NO_PROXY'] = 'translate.google.cn'
+if len(sys.argv)==1:
+    ct = win32api.GetConsoleTitle()
+    hd = win32gui.FindWindow(0, ct)
+    win32gui.ShowWindow(hd, 0)
 
 # Listen Keyboard
 SbyS_trans = False
