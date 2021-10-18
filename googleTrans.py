@@ -153,7 +153,7 @@ def __genTextPool(text):
     textPool = []
     while e < len(text):
         e = min(e,len(text)-1)
-        while text[e] not in ['\n','.','?','!','。','，','？','！']: e-=1
+        while text[e] not in ['\n','.','?','!','。','？','！']: e-=1
         textPool.append(text[s:(e+1)])
         s=e+1
         e+=(M+1)
