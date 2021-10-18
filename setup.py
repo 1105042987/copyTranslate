@@ -12,3 +12,7 @@ if len(sys.argv)>1 and sys.argv[1] == 'install':
 with open(p.join(base,'start.bat'),'w') as f:
     f.write('CALL '+ p.join(sys.path[4],'Scripts','activate.bat')+' '+sys.path[4]+'\n')
     f.write('start '+p.join(sys.path[4],'python')+' '+p.join(base,'copyTranslate.py'))
+
+with open(p.join(base,'replace.bat'),'w') as f:
+    f.write('CALL '+ p.join(sys.path[4],'Scripts','activate.bat')+' '+sys.path[4]+'\n')
+    f.write('start '+p.join(sys.path[4],'python')+' '+p.join(base,'replace_enter.py'))

@@ -1,5 +1,4 @@
 .vscode
 __pycache__
 ListenKeyboard.py
-stop.bat
-start.bat
+*.bat
