@@ -125,8 +125,8 @@ class UIThread(threading.Thread):
             info = info.replace('\n','').replace('\r','')
             if SbyS_trans:
                 info = re.sub(r'[\?\!。？！] *',lambda x:x.group()+'\n\n',info)
-                def func(m): return m.group()[0]+'\n\n'+m.group()[-1]*(m.group()[-1]!=' ')
-                info = re.sub('\. *[^0-9,]',func,info)
+                info = re.sub(r' *\. *','.',info)
+                info = re.sub(r'\.[^0-9,.\[\]][^,.]',lambda x:'.\n\n'+x.group()[-2:],info)
                 info = info.replace('. ','.\n\n')
             Trans_End = False
             self.copy['text'] = 'Translating...'

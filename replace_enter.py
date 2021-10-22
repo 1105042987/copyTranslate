@@ -81,8 +81,8 @@ def line():
     info = pyperclip.paste()
     info = info.replace('\n','').replace('\r','')
     info = re.sub(r'[\?\!。？！] *',lambda x:x.group()+'\n\n',info)
-    def func(m): return m.group()[0]+'\n\n'+m.group()[-1]*(m.group()[-1]!=' ')
-    info = re.sub('\. *[^0-9,]',func,info)
+    info = re.sub(' *\. *','.',info)
+    info = re.sub(r'\.[^0-9,.\[\]][^,.]',lambda x:'.\n\n'+x.group()[-2:],info)
     last = info
     pyperclip.copy(info)
 
@@ -98,7 +98,7 @@ if __name__ == '__main__':
         dic = json.load(f)
     name = ['translate','append']
     keys = [[checkList[x] if x in checkList else x for x in dic[n]] for n in name]
-    func = [rep,line]
+    func = [line,app]
     hm = PyHook3.HookManager()
     hm.KeyDown = onKeyDown
     hm.KeyUp = onKeyUp
