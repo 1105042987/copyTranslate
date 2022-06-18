@@ -91,7 +91,7 @@ def translate_request(js, text, tl='zh-CN', sl='auto'):
     url = build_url(text, js.get_tk(text), tl, sl)
     res = []
     try:
-        r = requests.get(url, headers=header)
+        r = requests.get(url, headers=header, timeout=5, proxies={"https":"https://127.0.0.1:1080"})
         result = json.loads(r.text)
         r.encoding = "UTF-8"
         if debug:
