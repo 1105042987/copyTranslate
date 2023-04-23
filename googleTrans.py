@@ -6,6 +6,7 @@ import threading
 # 用来判断是否需要打印日志
 debug = False
 
+http_roots = "translate.google.com"
 class Py4Js:
     def __init__(self):
         self.ctx = execjs.compile(""" 
@@ -58,7 +59,7 @@ def build_url(text, tk, tl='zh-CN', sl='auto'):
     :param tl:
     :return:
     """
-    return 'https://translate.google.cn/translate_a/single?client=webapp&sl='+sl+'&tl=' + tl + '&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&source=btn&ssel=0&tsel=0&kc=0&tk=' \
+    return f'https://{http_roots}/translate_a/single?client=webapp&sl='+sl+'&tl=' + tl + '&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&source=btn&ssel=0&tsel=0&kc=0&tk=' \
            + str(tk) + '&q=' + quote(text, encoding='utf-8')
 
 
@@ -77,7 +78,7 @@ def translate_request(js, text, tl='zh-CN', sl='auto'):
     """
 
     header = {
-        'authority': 'translate.google.cn',
+        'authority': http_roots,
         'method': 'GET',
         'path': '',
         'scheme': 'https',
@@ -91,7 +92,7 @@ def translate_request(js, text, tl='zh-CN', sl='auto'):
     url = build_url(text, js.get_tk(text), tl, sl)
     res = []
     try:
-        r = requests.get(url, headers=header, timeout=5, proxies={"https":"https://127.0.0.1:1080"})
+        r = requests.get(url, headers=header, timeout=5,proxies={"https":"http://127.0.0.1:1080","http":"http://127.0.0.1:1080"})
         result = json.loads(r.text)
         r.encoding = "UTF-8"
         if debug:

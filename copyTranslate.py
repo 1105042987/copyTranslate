@@ -12,7 +12,7 @@ import tkinter as tk
 import re
 from googleTrans import translate as GT
 
-os.environ['NO_PROXY'] = 'translate.google.cn'
+os.environ['NO_PROXY'] = 'translate.google.com'
 if len(sys.argv)==1:
     ct = win32api.GetConsoleTitle()
     hd = win32gui.FindWindow(0, ct)
@@ -57,6 +57,7 @@ if len(sys.argv)==1:
         f.write('taskkill /pid {} /f\n'.format(os.getpid()))
         f.write('del %0')
 
+#goods_rejection_info
 
 class TransThread(threading.Thread):
     def __init__(self,text):
@@ -66,6 +67,15 @@ class TransThread(threading.Thread):
     def run(self):
         global tarLan,Trans_End
         trans = GT(self.text,tarLan=tarLan)
+        if tarLan == 'zh-CN':
+            underline_words = re.findall('\w*_\w*',trans)
+            print(underline_words)
+            if len(underline_words)>0:
+                print('\n\n'.join(underline_words).replace('_',' '))
+                trans_element = GT('\n\n'.join(underline_words).replace('_',' '),tarLan=tarLan).split('\n\n')
+                trans_element = {j:f'{i}({j})'for i,j in zip(trans_element,underline_words)}
+                print(trans_element)
+                trans = re.sub('\w*_\w*',lambda x: trans_element[x.group()],trans)
         windowThread.showTrans(trans)
         Trans_End = True
 
@@ -111,7 +121,7 @@ class UIThread(threading.Thread):
         self.app.geometry("+{}+{}".format(w,h)) 
 
     def translate(self,append=False,oldInput=False):
-        global SbyS_trans,Trans_End,trans_call
+        global SbyS_trans,Trans_End,trans_call,tarLan
         if not Trans_End: return
         if trans_call is not None: trans_call.join()
         info = pyperclip.paste()
@@ -121,8 +131,10 @@ class UIThread(threading.Thread):
                 info = self.last + ' ' + info
                 pyperclip.copy(info)
             self.last = info
-            # info = info.replace('\n',' ').replace('\r',' ')
-            info = info.replace('\n','').replace('\r','')
+            if tarLan == 'zh-CN':
+                info = info.replace('\n',' ').replace('\r',' ')
+            else:
+                info = info.replace('\n','').replace('\r','')
             if SbyS_trans:
                 info = re.sub(r'[\?\!。？！] *',lambda x:x.group()+'\n\n',info)
                 info = re.sub(r' *\. *','.',info)
