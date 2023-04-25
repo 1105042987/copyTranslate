@@ -69,12 +69,9 @@ class TransThread(threading.Thread):
         trans = GT(self.text,tarLan=tarLan)
         if tarLan == 'zh-CN':
             underline_words = re.findall('\w*_\w*',trans)
-            print(underline_words)
             if len(underline_words)>0:
-                print('\n\n'.join(underline_words).replace('_',' '))
                 trans_element = GT('\n\n'.join(underline_words).replace('_',' '),tarLan=tarLan).split('\n\n')
                 trans_element = {j:f'{i}({j})'for i,j in zip(trans_element,underline_words)}
-                print(trans_element)
                 trans = re.sub('\w*_\w*',lambda x: trans_element[x.group()],trans)
         windowThread.showTrans(trans)
         Trans_End = True
@@ -136,7 +133,7 @@ class UIThread(threading.Thread):
             else:
                 info = info.replace('\n','').replace('\r','')
 
-            running_re_sub = json.load(open("running_re_sub.jsonc"))
+            running_re_sub = json.load(open(os.path.join(base,"running_re_sub.jsonc"),'r'))
             for pattern, repl in running_re_sub.items():
                 info = re.sub(pattern,repl,info)
             if SbyS_trans:

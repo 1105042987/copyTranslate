@@ -1,4 +1,3 @@
 {
-    " *\\(.*?\\)":"", // 去除所有括号内的内容
-
+    " *\\(.*?\\)":"",  // Eliminate all of the content between () 
 }
