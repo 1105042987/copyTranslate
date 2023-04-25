@@ -3,6 +3,7 @@
 
     "translate": ["ctrl", "shift", "Q"], 
     "append":   ["ctrl", "shift", "A"], 
+    "show": ["ctrl", "shift", "T"],
 
     "//Combination":["shift", "ctrl", "alt"],
     "//Last_Key (can choose only one)":[

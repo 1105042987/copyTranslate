@@ -87,6 +87,7 @@ class UIThread(threading.Thread):
         self.hide = True
 
     def show(self):
+        if not self.hide: return
         self.hide = False
         self.app.update()
         self.app.deiconify()
@@ -109,8 +110,7 @@ class UIThread(threading.Thread):
     def showTrans(self,trans):
         if len(trans)==0: self.last = ''
         self.textBoard['text'] = trans
-        if self.hide:
-            self.show()
+        self.show()
         self.copy['text'] = 'Copy'
         self.app.update()
         w=self.app.winfo_screenwidth() - 350
@@ -143,13 +143,16 @@ class UIThread(threading.Thread):
                 info = info.replace('. ','.\n\n')
             Trans_End = False
             self.copy['text'] = 'Translating...'
+            self.processed_ori_info = info
             trans_call = TransThread(info)
             trans_call.start()
-        if self.hide:
-            self.show()
+        self.show()
 
     def Tcopy(self):
         pyperclip.copy(self.textBoard['text'])
+
+    def Tcopy_ori(self):
+        pyperclip.copy(self.processed_ori_info)
 
     def run(self):
         self.app = tk.Tk()
@@ -166,8 +169,10 @@ class UIThread(threading.Thread):
 
         self.textBoard = tk.Label(self.app, text='', bg='white', width = 43, wraplength = 240, justify = 'left')
         self.textBoard.pack()
-        self.copy = tk.Button(self.app, text="Copy", command=self.Tcopy, bg = "DeepSkyBlue", width=43, height=1)
-        self.copy.pack()
+        self.copy = tk.Button(self.app, text="Copy", command=self.Tcopy, bg = "DeepSkyBlue", width=30, height=1)
+        self.copy_ori = tk.Button(self.app, text="Ori-Text", command=self.Tcopy_ori, bg = "BurlyWood", width=12, height=1)
+        self.copy.pack(side=tk.LEFT)
+        self.copy_ori.pack(side=tk.LEFT)
 
         self.showTrans('')
         self.on_closing()
@@ -203,10 +208,10 @@ if __name__ == "__main__":
     base = sys.path[0]
     with open(os.path.join(base,'setting.jsonc'),'r') as f:
         dic = json.load(f)
-    name = ['translate','append']
+    name = ['translate','append','show']
     keys = [[checkList[x] if x in checkList else x for x in dic[n]] for n in name]
     windowThread = UIThread()
-    func = [windowThread.translate,windowThread.appendText]
+    func = [windowThread.translate,windowThread.appendText,windowThread.show]
     windowThread.start()
     hm = PyHook3.HookManager()
     hm.KeyDown = onKeyDown
