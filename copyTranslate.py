@@ -1,6 +1,6 @@
 import os
 import sys
-import json
+import json5 as json
 from time import time
 import PyHook3
 import win32api
@@ -135,6 +135,10 @@ class UIThread(threading.Thread):
                 info = info.replace('\n',' ').replace('\r',' ')
             else:
                 info = info.replace('\n','').replace('\r','')
+
+            running_re_sub = json.load(open("running_re_sub.jsonc"))
+            for pattern, repl in running_re_sub.items():
+                info = re.sub(pattern,repl,info)
             if SbyS_trans:
                 info = re.sub(r'[\?\!。？！] *',lambda x:x.group()+'\n\n',info)
                 info = re.sub(r' *\. *','.',info)
@@ -200,7 +204,7 @@ def onKeyDown(event):
         
 if __name__ == "__main__":
     base = sys.path[0]
-    with open(os.path.join(base,'setting.json'),'r') as f:
+    with open(os.path.join(base,'setting.jsonc'),'r') as f:
         dic = json.load(f)
     name = ['translate','append']
     keys = [[checkList[x] if x in checkList else x for x in dic[n]] for n in name]

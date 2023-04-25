@@ -94,7 +94,7 @@ def app():
 
 if __name__ == '__main__':
     base = sys.path[0]
-    with open(os.path.join(base,'setting.json'),'r') as f:
+    with open(os.path.join(base,'setting.jsonc'),'r') as f:
         dic = json.load(f)
     name = ['translate','append']
     keys = [[checkList[x] if x in checkList else x for x in dic[n]] for n in name]

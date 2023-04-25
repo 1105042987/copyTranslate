@@ -1,5 +1,5 @@
 {
-    "//":"Ensure that the combination key is end with the elements in last part",
+    //Ensure that the combination key is end with the elements in last part
 
     "translate": ["ctrl", "shift", "Q"], 
     "append":   ["ctrl", "shift", "A"], 
