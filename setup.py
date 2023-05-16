@@ -6,7 +6,7 @@ base = p.dirname(p.abspath(__file__))
 
 if len(sys.argv)>1 and sys.argv[1] == 'install':
     os.system('python -m pip install --upgrade pip')
-    os.system('pip install pyperclip PyExecJS')
+    os.system('pip install pyperclip PyExecJS json5 pypiwin32 requests')
     os.system('pip install '+p.join(base,'PyHook3-1.6.1-cp37-cp37m-win_amd64.whl'))
 
 with open(p.join(base,'start.bat'),'w') as f:
